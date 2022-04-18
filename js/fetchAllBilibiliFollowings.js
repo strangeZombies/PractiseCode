@@ -12,7 +12,7 @@ function sleep(time) {
 }
 
 async function fetchFollowings(pn) {
-    let vmid =301807432,ps=50;
+    let vmid =,ps=50; //
     let urls ="https://api.bilibili.com/x/relation/followings" + `?vmid=${vmid}&ps=${ps}&pn=${pn}`;  
     try{
         let res = await fetch(
