@@ -9,8 +9,8 @@
 // @name:ru            Удалить YouTube Shorts
 // @name:id            Hapus YouTube Shorts
 // @name:hi            YouTube Shorts हटाएँ
-// @namespace          https://github.com/strangeZombies/aweb2mdtool
-// @version            2024-12-11
+// @namespace          https://github.com/strangeZombies
+// @version            2024-12-30.4
 // @description        Remove YouTube Shorts tags, dismissible elements, Shorts links, and Reel Shelf
 // @description:zh-CN  移除 YouTube 上的 Shorts 标签、Dismissible 元素、Shorts 链接和 Reel Shelf
 // @description:zh-TW  移除 YouTube 上的 Shorts 标签、Dismissible 元素、Shorts 链接和 Reel Shelf
