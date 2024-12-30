@@ -4,7 +4,7 @@
 
 * [移除 YouTube Shorts](https://greasyfork.org/zh-CN/scripts/522057-remove-youtube-shorts)
   
-> 例如 https://www.youtube.com/watch?v=fdlj8BnOeqo 简介中也植入了shorts是通过更多中剪辑按钮，所以剪辑按钮也需要被删除
+  - [ ] 例如 https://www.youtube.com/watch?v=fdlj8BnOeqo 简介中也植入了shorts是通过更多中剪辑按钮，所以剪辑按钮也需要被删除
 
 ### 以往
 
