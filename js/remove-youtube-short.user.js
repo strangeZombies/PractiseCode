@@ -10,7 +10,7 @@
 // @name:id            Hapus YouTube Shorts
 // @name:hi            YouTube Shorts हटाएँ
 // @namespace          https://github.com/strangeZombies
-// @version            2024-12-31.0
+// @version            2024-12-31.2
 // @description         Remove YouTube Shorts tags, dismissible elements, Shorts links, and Reel Shelf
 // @description:zh-CN   移除 YouTube 上的 Shorts 标签、Dismissible 元素、Shorts 链接和 Reel Shelf
 // @description:zh-TW   移除 YouTube 上的 Shorts 标签、Dismissible 元素、Shorts 链接和 Reel Shelf
