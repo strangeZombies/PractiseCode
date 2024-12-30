@@ -40,6 +40,7 @@
       'ytd-reel-shelf-renderer',
       'ytd-search ytd-video-renderer [overlay-style="SHORTS"]',
       '#related ytd-compact-video-renderer [overlay-style="SHORTS"]',
+      'a#endpoint[title="Shorts"]', 
   ];
 
   const mobileSelectors = [
