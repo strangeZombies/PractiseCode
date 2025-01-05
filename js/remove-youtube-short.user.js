@@ -10,7 +10,7 @@
 // @name:id            Hapus YouTube Shorts
 // @name:hi            YouTube Shorts हटाएँ
 // @namespace          https://github.com/strangeZombies
-// @version            2025.1.5.1
+// @version            2025.1.5.2
 // @description         Remove YouTube Shorts tags, dismissible elements, Shorts links, and Reel Shelf
 // @description:zh-CN   移除 YouTube 上的 Shorts 标签、Dismissible 元素、Shorts 链接和 Reel Shelf
 // @description:zh-TW   移除 YouTube 上的 Shorts 标签、Dismissible 元素、Shorts 链接和 Reel Shelf
@@ -35,7 +35,7 @@
 
     // 配置项
     const hideHistoryShorts = false; // 是否移除历史记录中的 Shorts 元素
-
+    const debug = false;
     // 通用选择器
     const commonSelectors = [
         'a[href*="/shorts/"]',
@@ -79,7 +79,7 @@
                     parent.dataset.removedByScript = "true"; // 标记为已处理
                 });
             } catch (error) {
-                //debug console.error(`Failed to process selector: ${selector}`, error);
+                if (debug) { console.error(`Failed to process selector: ${selector}`, error) };
             }
         });
     }
@@ -118,7 +118,7 @@
 
     // 初始化脚本
     function init() {
-        //debug console.log('Remove YouTube Shorts Enhanced script activated');
+        if (debug) (console.log('Remove YouTube Shorts Enhanced script activated'));
         removeElements(); // 初次加载时执行清理
 
         // 监听导航完成事件
