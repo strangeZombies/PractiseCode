@@ -33,109 +33,64 @@
 (function () {
     'use strict';
 
-    const hideHistoryShorts = false;
+    // 配置项
+    const hideHistoryShorts = false; // 是否移除历史记录中的 Shorts 元素
 
+    // 通用选择器
     const commonSelectors = [
+        'a[href*="/shorts/"]',
+        '[is-shorts]',
+        'yt-chip-cloud-chip-renderer:has(a[href*="/shorts/"])',
+        'ytd-reel-shelf-renderer',
+        'ytd-thumbnail-overlay-time-status-renderer[overlay-style="SHORTS"]',
+        '#guide [title="Shorts"]',
         '.ytd-mini-guide-entry-renderer[title="Shorts"]',
         '.ytd-mini-guide-entry-renderer[aria-label="Shorts"]',
-        '[is-shorts]',
-        '#guide [title="Shorts"]',
-        'ytd-reel-shelf-renderer',
-        'ytd-search ytd-video-renderer [overlay-style="SHORTS"]',
-        '#related ytd-compact-video-renderer [overlay-style="SHORTS"]',
     ];
 
+    // 移动端选择器
     const mobileSelectors = [
         '.pivot-shorts',
         'ytm-reel-shelf-renderer',
         'ytm-search ytm-video-with-context-renderer [data-style="SHORTS"]',
     ];
 
+    // 特定页面选择器
     const feedSelectors = [
         'ytd-browse[page-subtype="subscriptions"] ytd-grid-video-renderer [overlay-style="SHORTS"]',
         'ytd-browse[page-subtype="subscriptions"] ytd-video-renderer [overlay-style="SHORTS"]',
         'ytd-browse[page-subtype="subscriptions"] ytd-rich-item-renderer [overlay-style="SHORTS"]',
     ];
+    const channelSelectors = ['yt-tab-shape[tab-title="Shorts"]'];
+    const historySelectors = ['ytd-browse[page-subtype="history"] ytd-reel-shelf-renderer'];
 
-    const channelSelectors = [
-        'yt-tab-shape[tab-title="Shorts"]',
-    ];
-
-    const historySelectors = [
-        'ytd-browse[page-subtype="history"] ytd-reel-shelf-renderer',
-    ];
-
-    // 通用方法：根据选择器移除元素
+    // 移除 Shorts 元素的函数
     function removeElementsBySelectors(selectors) {
         selectors.forEach((selector) => {
             try {
-                // 优先尝试直接查询元素
                 const elements = document.querySelectorAll(selector);
-                if (elements.length > 0) {
-                    elements.forEach((element) => {
-                        let parent = element.closest(
-                            'ytd-video-renderer, ytd-grid-video-renderer, ytd-compact-video-renderer, ytd-rich-item-renderer, ytm-video-with-context-renderer'
-                        );
-                        if (!parent) {
-                            parent = element; // 如果没有父节点，直接移除当前节点
-                        }
-                        parent.remove();
-                    });
-                }
-            } catch (error) {
-                //console.warn(`Selector failed: ${selector}`, error);
-
-                // 使用备用方案：手动遍历父节点
-                const elements = manualQuerySelector(selector);
                 elements.forEach((element) => {
+                    if (element.dataset.removedByScript) return; // 跳过已处理的元素
                     let parent = element.closest(
                         'ytd-video-renderer, ytd-grid-video-renderer, ytd-compact-video-renderer, ytd-rich-item-renderer, ytm-video-with-context-renderer'
                     );
-                    if (!parent) {
-                        parent = element; // 如果没有父节点，直接移除当前节点
-                    }
+                    if (!parent) parent = element;
                     parent.remove();
+                    parent.dataset.removedByScript = "true"; // 标记为已处理
                 });
+            } catch (error) {
+                //debug console.error(`Failed to process selector: ${selector}`, error);
             }
         });
     }
 
-    // 手动实现的选择器解析函数（仅适用于简单选择器）
-    function manualQuerySelector(selector) {
-        const results = [];
-        const parts = selector.split(':');
-        const baseSelector = parts[0];
-        const upwardSelector = parts[1]?.includes('upward') ? parts[1] : null;
-
-        // 查找所有基础选择器匹配的元素
-        const elements = document.querySelectorAll(baseSelector);
-        elements.forEach((element) => {
-            if (upwardSelector) {
-                // 手动向上遍历，查找符合条件的父节点
-                let parent = element.parentElement;
-                while (parent) {
-                    if (parent.matches(upwardSelector)) {
-                        results.push(parent);
-                        break;
-                    }
-                    parent = parent.parentElement;
-                }
-            } else {
-                results.push(element);
-            }
-        });
-
-        return results;
-    }
-
-    // 删除 Shorts 元素
+    // 根据 URL 定位要处理的选择器
     function removeElements() {
         const currentUrl = window.location.href;
 
         if (currentUrl.includes('m.youtube.com')) {
             removeElementsBySelectors(mobileSelectors);
         }
-        // 已知存在无用或未生效的选择器
         if (currentUrl.includes('/feed/subscriptions')) {
             removeElementsBySelectors(feedSelectors);
         }
@@ -146,25 +101,38 @@
             removeElementsBySelectors(historySelectors);
         }
 
-        // 通用选择器
+        // 通用选择器适用于所有页面
         removeElementsBySelectors(commonSelectors);
     }
 
     // 防抖函数
-    let debounceTimeout;
-    function debouncedRemoveElements() {
-        clearTimeout(debounceTimeout);
-        debounceTimeout = setTimeout(removeElements, 200);
+    function debounce(func, delay) {
+        let timeout;
+        return (...args) => {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), delay);
+        };
     }
 
-    // 初始化事件监听
-    window.addEventListener('load', removeElements);
-    document.addEventListener('yt-navigate-finish', removeElements);
+    const debouncedRemoveElements = debounce(removeElements, 500);
 
-    // 观察 DOM 变化
-    const observer = new MutationObserver(debouncedRemoveElements);
-    observer.observe(document.body, { childList: true, subtree: true });
+    // 初始化脚本
+    function init() {
+        //debug console.log('Remove YouTube Shorts Enhanced script activated');
+        removeElements(); // 初次加载时执行清理
+
+        // 监听导航完成事件
+        document.addEventListener('yt-navigate-finish', removeElements);
+
+        // 监听 DOM 变化
+        const observer = new MutationObserver(debouncedRemoveElements);
+        observer.observe(document.body, { childList: true, subtree: true });
+    }
+
+    // 等待页面完全加载后初始化脚本
+    window.addEventListener('load', init);
 })();
+
 
 //const selectors = [
 //    https://gist.github.com/sumonst21/1779307b807509488d1a915d2bd370bd
