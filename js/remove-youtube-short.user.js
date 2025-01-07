@@ -10,7 +10,7 @@
 // @name:id            Hapus YouTube Shorts
 // @name:hi            YouTube Shorts हटाएँ
 // @namespace          https://github.com/strangeZombies
-// @version            2025.1.5.2
+// @version            2025.1.8.0
 // @description         Remove YouTube Shorts tags, dismissible elements, Shorts links, and Reel Shelf
 // @description:zh-CN   移除 YouTube 上的 Shorts 标签、Dismissible 元素、Shorts 链接和 Reel Shelf
 // @description:zh-TW   移除 YouTube 上的 Shorts 标签、Dismissible 元素、Shorts 链接和 Reel Shelf
@@ -26,8 +26,8 @@
 // @match              https://www.youtube.com/*
 // @match              https://m.youtube.com/*
 // @grant              none
-// @downloadURL        https://update.greasyfork.org/scripts/522057/Remove%20Youtube%20Shorts.user.js
-// @updateURL          https://update.greasyfork.org/scripts/522057/Remove%20Youtube%20Shorts.meta.js
+// @downloadURL https://update.greasyfork.org/scripts/522057/Remove%20YouTube%20Shorts.user.js
+// @updateURL https://update.greasyfork.org/scripts/522057/Remove%20YouTube%20Shorts.meta.js
 // ==/UserScript==
 
 (function () {
@@ -35,7 +35,7 @@
 
     // 配置项
     const hideHistoryShorts = false; // 是否移除历史记录中的 Shorts 元素
-    const debug = false;
+    const debug = false; // 启用调试模式
     // 通用选择器
     const commonSelectors = [
         'a[href*="/shorts/"]',
@@ -69,6 +69,9 @@
         selectors.forEach((selector) => {
             try {
                 const elements = document.querySelectorAll(selector);
+                if (elements.length > 0 && debug) {
+                    console.log(`Found elements for selector: ${selector}`);
+                }
                 elements.forEach((element) => {
                     if (element.dataset.removedByScript) return; // 跳过已处理的元素
                     let parent = element.closest(
@@ -77,9 +80,14 @@
                     if (!parent) parent = element;
                     parent.remove();
                     parent.dataset.removedByScript = "true"; // 标记为已处理
+                    if (debug) {
+                        console.log(`Removed element: ${parent}`);
+                    }
                 });
             } catch (error) {
-                if (debug) { console.error(`Failed to process selector: ${selector}`, error) };
+                if (debug) { 
+                    console.warn(`No elements found for selector: ${selector}`); 
+                }
             }
         });
     }
@@ -87,6 +95,9 @@
     // 根据 URL 定位要处理的选择器
     function removeElements() {
         const currentUrl = window.location.href;
+        if (debug) {
+            console.log('Current URL:', currentUrl);
+        }
 
         if (currentUrl.includes('m.youtube.com')) {
             removeElementsBySelectors(mobileSelectors);
@@ -114,11 +125,11 @@
         };
     }
 
-    const debouncedRemoveElements = debounce(removeElements, 500);
+    const debouncedRemoveElements = debounce(removeElements, 300); // 缩短防抖延迟时间为 300ms
 
     // 初始化脚本
     function init() {
-        if (debug) (console.log('Remove YouTube Shorts Enhanced script activated'));
+        if (debug) { console.log('Remove YouTube Shorts Enhanced script activated'); }
         removeElements(); // 初次加载时执行清理
 
         // 监听导航完成事件
