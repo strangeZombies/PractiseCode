@@ -10,22 +10,23 @@
 // @name:id            Hapus YouTube Shorts
 // @name:hi            YouTube Shorts हटाएँ
 // @namespace          https://github.com/strangeZombies
-// @version            2025.1.8.0
-// @description         Remove YouTube Shorts tags, dismissible elements, Shorts links, and Reel Shelf
-// @description:zh-CN   移除 YouTube 上的 Shorts 标签、Dismissible 元素、Shorts 链接和 Reel Shelf
-// @description:zh-TW   移除 YouTube 上的 Shorts 标签、Dismissible 元素、Shorts 链接和 Reel Shelf
-// @description:ja      YouTube 上の Shorts タグ、ディスミッシブル要素、Shorts リンク、および Reel Shelf を削除
-// @description:ko      YouTube의 Shorts 태그, 해제 가능한 요소, Shorts 링크 및 Reel 선반 제거
-// @description:es      Eliminar etiquetas de Shorts de YouTube, elementos desechables, enlaces de Shorts y estante de carretes
-// @description:pt-BR   Remover tags de Shorts do YouTube, elementos descartáveis, links de Shorts e prateleira de rolos
-// @description:ru      Удалите теги YouTube Shorts, элементы, которые можно отклонить, ссылки на Shorts и полку с катушками
-// @description:id      Hapus tag Shorts YouTube, elemen yang dapat dihapus, tautan Shorts, dan Rak Reel
-// @description:hi      YouTube Shorts टैग, खारिज करने योग्य तत्व, Shorts लिंक और Reel Shelf निकालें
+// @version            2025.1.13.0
+// @description        Remove YouTube Shorts tags, dismissible elements, Shorts links, and Reel Shelf
+// @description:zh-CN  移除 YouTube 上的 Shorts 标签、Dismissible 元素、Shorts 链接和 Reel Shelf
+// @description:zh-TW  移除 YouTube 上的 Shorts 标签、Dismissible 元素、Shorts 链接和 Reel Shelf
+// @description:ja     YouTube 上の Shorts タグ、ディスミッシブル要素、Shorts リンク、および Reel Shelf を削除
+// @description:ko     YouTube의 Shorts 태그, 해제 가능한 요소, Shorts 링크 및 Reel 선반 제거
+// @description:es     Eliminar etiquetas de Shorts de YouTube, elementos desechables, enlaces de Shorts y estante de carretes
+// @description:pt-BR  Remover tags de Shorts do YouTube, elementos descartáveis, links de Shorts e prateleira de rolos
+// @description:ru     Удалите теги YouTube Shorts, элементы, которые можно отклонить, ссылки на Shorts и полку с катушками
+// @description:id     Hapus tag Shorts YouTube, elemen yang dapat dihapus, tautan Shorts, dan Rak Reel
+// @description:hi     YouTube Shorts टैग, खारिज करने योग्य तत्व, Shorts लिंक और Reel Shelf निकालें
 // @author             StrangeZombies
 // @icon               https://www.google.com/s2/favicons?sz=64&domain=youtube.com
-// @match              https://www.youtube.com/*
+// @match              https://*.youtube.com/*
 // @match              https://m.youtube.com/*
 // @grant              none
+// @run-at             document-start
 // @downloadURL https://update.greasyfork.org/scripts/522057/Remove%20YouTube%20Shorts.user.js
 // @updateURL https://update.greasyfork.org/scripts/522057/Remove%20YouTube%20Shorts.meta.js
 // ==/UserScript==
@@ -36,6 +37,7 @@
     // 配置项
     const hideHistoryShorts = false; // 是否移除历史记录中的 Shorts 元素
     const debug = false; // 启用调试模式
+
     // 通用选择器
     const commonSelectors = [
         'a[href*="/shorts/"]',
@@ -69,9 +71,6 @@
         selectors.forEach((selector) => {
             try {
                 const elements = document.querySelectorAll(selector);
-                if (elements.length > 0 && debug) {
-                    console.log(`Found elements for selector: ${selector}`);
-                }
                 elements.forEach((element) => {
                     if (element.dataset.removedByScript) return; // 跳过已处理的元素
                     let parent = element.closest(
@@ -79,15 +78,11 @@
                     );
                     if (!parent) parent = element;
                     parent.remove();
-                    parent.dataset.removedByScript = "true"; // 标记为已处理
-                    if (debug) {
-                        console.log(`Removed element: ${parent}`);
-                    }
+                    parent.dataset.removedByScript = 'true'; // 标记为已处理
+                    if (debug) console.log(`Removed element: ${parent}`);
                 });
             } catch (error) {
-                if (debug) { 
-                    console.warn(`No elements found for selector: ${selector}`); 
-                }
+                if (debug) console.warn(`Error processing selector: ${selector}`, error);
             }
         });
     }
@@ -95,9 +90,7 @@
     // 根据 URL 定位要处理的选择器
     function removeElements() {
         const currentUrl = window.location.href;
-        if (debug) {
-            console.log('Current URL:', currentUrl);
-        }
+        if (debug) console.log('Current URL:', currentUrl);
 
         if (currentUrl.includes('m.youtube.com')) {
             removeElementsBySelectors(mobileSelectors);
@@ -125,25 +118,35 @@
         };
     }
 
-    const debouncedRemoveElements = debounce(removeElements, 300); // 缩短防抖延迟时间为 300ms
+    const debouncedRemoveElements = debounce(removeElements, 300);
 
     // 初始化脚本
     function init() {
-        if (debug) { console.log('Remove YouTube Shorts Enhanced script activated'); }
+        if (debug) console.log('Remove YouTube Shorts script activated');
         removeElements(); // 初次加载时执行清理
 
-        // 监听导航完成事件
-        document.addEventListener('yt-navigate-finish', removeElements);
+        // 跨浏览器支持的导航事件
+        const isFirefox = navigator.userAgent.includes('Firefox');
+        if (isFirefox) {
+            // Firefox 使用 popstate 监听导航变化
+            window.addEventListener('popstate', removeElements);
+        } else {
+            // Chrome 使用 yt-navigate 事件
+            document.addEventListener('yt-navigate-finish', removeElements);
+        }
 
         // 监听 DOM 变化
         const observer = new MutationObserver(debouncedRemoveElements);
         observer.observe(document.body, { childList: true, subtree: true });
     }
 
-    // 等待页面完全加载后初始化脚本
-    window.addEventListener('load', init);
+    // 等待 DOM 完全加载后初始化脚本
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
 })();
-
 
 //const selectors = [
 //    https://gist.github.com/sumonst21/1779307b807509488d1a915d2bd370bd
