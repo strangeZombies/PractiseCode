@@ -3,6 +3,8 @@
 油猴脚本制作
 2025.1.5
 * [移除 YouTube Shorts](https://greasyfork.org/zh-CN/scripts/522057-remove-youtube-shorts)
+
+  `results/`需要增加选择器
   
 ### 以往
 
