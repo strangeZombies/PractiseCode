@@ -10,7 +10,7 @@
 // @name:id            Hapus YouTube Shorts
 // @name:hi            YouTube Shorts हटाएँ
 // @namespace          https://github.com/strangeZombies
-// @version            2025.1.13.0
+// @version            2025.4.4.0
 // @description        Remove YouTube Shorts tags, dismissible elements, Shorts links, and Reel Shelf
 // @description:zh-CN  移除 YouTube 上的 Shorts 标签、Dismissible 元素、Shorts 链接和 Reel Shelf
 // @description:zh-TW  移除 YouTube 上的 Shorts 标签、Dismissible 元素、Shorts 链接和 Reel Shelf
@@ -98,9 +98,10 @@
         if (currentUrl.includes('/feed/subscriptions')) {
             removeElementsBySelectors(feedSelectors);
         }
-        if (currentUrl.includes('/channel') || currentUrl.includes('/@')) {
-            removeElementsBySelectors(channelSelectors);
-        }
+        // 需要重新做，因为会多删除，还有其它bug在其它部分，还没来得及搞，能用就行
+        //if (currentUrl.includes('/channel') || currentUrl.includes('/@')) {
+        //    removeElementsBySelectors(channelSelectors);
+        //}
         if (hideHistoryShorts && currentUrl.includes('/feed/history')) {
             removeElementsBySelectors(historySelectors);
         }
