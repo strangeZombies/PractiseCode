@@ -4,14 +4,14 @@
 // @name:en      Auto Scroll to Bottom with Dynamic Loading
 // @name:es      Desplazamiento Automático al Final con Carga Dinámica
 // @name:ja      自動スクロール（動的読み込み対応）
-// @namespace    http://tampermonkey.net/
+// @namespace    https://github.com/strangeZombies/PractiseCode
 // @version      1.5
 // @description  Automatically scroll to the bottom of the page, continue scrolling to trigger dynamic content loading, and stop after a configurable timeout if no new content is loaded. Supports multiple languages for better usability and searchability.
 // @description:zh-CN  自动滚动到页面底部，持续滚动以触发动态内容加载，若无新内容则在可配置的超时时间后停止。支持多语言，提升使用和检索便捷性。
 // @description:en     Automatically scroll to the bottom of the page, continue scrolling to trigger dynamic content loading, and stop after a configurable timeout if no new content is loaded. Supports multiple languages for better usability and searchability.
 // @description:es     Desplaza automáticamente hasta el final de la página, continúa desplazándose para activar la carga de contenido dinámico y se detiene tras un tiempo configurable si no se carga nuevo contenido. Soporta múltiples idiomas para mejor usabilidad y búsqueda.
 // @description:ja     ページの最下部まで自動でスクロールし、動的コンテンツの読み込みをトリガーするためにスクロールを継続し、新しいコンテンツが読み込まれない場合は設定可能なタイムアウト後に停止します。多言語対応で使いやすさと検索性を向上。
-// @author       Grok
+// @author       strangezombies
 // @match        *://*/*
 // @grant        GM_setValue
 // @grant        GM_getValue
@@ -19,6 +19,7 @@
 // @keyword      auto scroll, infinite scroll, dynamic loading, 自动滚动, 无限滚动, 动态加载, desplazamiento automático, carga dinámica, 自動スクロール, 動的読み込み
 // ==/UserScript==
 
+// 由Grok自动生成
 (function() {
     'use strict';
 
